@@ -17,11 +17,18 @@ final class Template
     // {{{ properties
  
     /**
-     * Template - HTML
+     * Template URL
      *
-     * @var view
+     * @var string 
      */
-    private $view;
+    private $view_url;
+ 
+    /**
+     * Template vars
+     *
+     * @var array 
+     */
+    public $vars = Array();
  
     // }}}
 
@@ -32,8 +39,8 @@ final class Template
      *
      * @param string $view HTML
      */
-    public function __construct ($view) {
-        $this->view = $view;
+    public function __construct ($view_url) {
+        $this->view_url = $view_url;
     }
  
     // }}}
@@ -44,7 +51,15 @@ final class Template
      * Render template
      */
     public function render () {
-        echo $this->view;
+        Debugger::test('isArray', $this->vars, 'Template->render(): Template vars is Array?');
+        
+        foreach ($this->vars as $name=>$value) {
+            $$name = $value;
+        }
+        
+        if (file_exists($this->view_url)) {
+            include_once ($this->view_url);
+        }
     }
  
     // }}}

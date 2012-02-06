@@ -85,7 +85,7 @@ final class Application extends Object
             // Set controller, model, view and language URL
         $controller_url = __DIR__ . '/../Application/Controllers/' . $controller_name . 'Controller.class.php';
         $model_url = __DIR__ . '/../Application/Models/' . $controller_name . 'Model.class.php';
-        $view_url = __DIR__ . '/../Application/Views/' . $controller_name . 'View.html';
+        $view_url = __DIR__ . '/../Application/Views/' . $controller_name . 'View.php';
         $language_url = __DIR__ . '/../Languages/' . $language . '.php';
         
             // Set classes and method name
@@ -103,7 +103,6 @@ final class Application extends Object
             // Load files
         include_once ($controller_url);
         include_once ($model_url);
-        $view = file_get_contents($view_url);
         include_once ($language_url);
         
         Debugger::test('isArray', $lang, 'Application->run(): Language "'.$language.'" from file is not array');
@@ -116,7 +115,7 @@ final class Application extends Object
         $controller = new $controller_class;
         $controller->model = new $model_class;
         $controller->parameters = $this->parameters;
-        $controller->template = new Template($view);
+        $controller->template = new Template($view_url);
         $controller->lang = $lang;
         
             // Run application

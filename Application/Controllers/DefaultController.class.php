@@ -20,7 +20,11 @@ final class DefaultController extends BaseController
      * Default action
      */
     public function defaultAction () {
-        echo $this->lang['lorem'];
+        $tpl_vars = array();
+        $tpl_vars['title'] = 'Titulek stránky';
+        $tpl_vars['headline'] = 'Nadpis stránky';
+        $tpl_vars['text'] = 'Text stránky';
+        $this->template->vars = $tpl_vars;
     }
  
     // }}}
