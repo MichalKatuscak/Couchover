@@ -45,7 +45,7 @@ final class Template
  
     // }}}
 
-    // {{{ __destruct
+    // {{{ render
  
     /**
      * Render template
