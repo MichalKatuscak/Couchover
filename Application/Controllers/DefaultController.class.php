@@ -28,17 +28,6 @@ final class DefaultController extends BaseController
     }
  
     // }}}
-    // 
-    // {{{ secondAction
- 
-    /**
-     * Second action
-     */
-    public function secondAction () {
-        echo 'ID: '.htmlspecialchars($this->parameters['others'][0]);
-    }
- 
-    // }}}
 }
  
 // }}}
