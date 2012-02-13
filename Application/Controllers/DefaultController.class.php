@@ -22,8 +22,8 @@ final class DefaultController extends BaseController
     public function defaultAction () {
         $tpl_vars = array();
         $tpl_vars['title'] = 'Titulek stránky';
-        $tpl_vars['headline'] = 'Nadpis stránky';
-        $tpl_vars['text'] = 'Text stránky';
+        $tpl_vars['headline'] = '<i>Nadpis</i> stránky';
+        $tpl_vars['style'] = 'color:blue;\' onclick=\'alert("XSS")';
         $this->template->vars = $tpl_vars;
     }
  
