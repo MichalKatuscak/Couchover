@@ -1,0 +1,37 @@
+.couchover-control-submit {
+    border: 1px #000 solid;
+    background-color: #ddd;
+    color: #000;
+    margin: 5px;
+}
+
+.couchover-control-submit:hover {
+    border: 1px #000 solid;
+    background-color: #ccc;
+    color: #333;
+}
+
+.couchover-control-submit:active {
+    border: 1px #333 solid;
+    background-color: #bbb;
+    color: #000;
+}
+
+.couchover-control-ok {
+    border: 1px #000 solid;
+    background-color: #000;
+    color: #fff;
+    margin: 5px;
+}
+
+.couchover-control-ok:hover {
+    border: 1px #000 solid;
+    background-color: #333;
+    color: #fff;
+}
+
+.couchover-control-ok:active {
+    border: 1px #000 solid;
+    background-color: #333;
+    color: #ccc;
+}
