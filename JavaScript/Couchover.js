@@ -207,7 +207,7 @@ Couchover.Body.prototype.showDialog = function (title, text, width) {
  *  
  *  @param string type  submit || ok
  *  @param string text
- *  @param function function_on_control Function on control when you click
+ *  @param callable function_on_control Function on control when you click
  *  @param string place Place of control
  */
 Couchover.Control = function (type, text, function_on_control, place) {
@@ -243,6 +243,74 @@ Couchover.Control = function (type, text, function_on_control, place) {
     } 
     
     return false;
+}
+
+
+/********** AJAX **********/
+
+/**
+ *  AJAX - Communication with server
+ *  
+ *  @param object setting Configuration
+ */
+Couchover.AJAX = function (settings) {
+    var method = (settings.method == 'POST' || settings.method == 'GET') ? settings.method : 'GET';
+    var data = settings.data;
+    var target = settings.target;
+    var url = settings.url;
+    
+    var data_string = '';
+    var i = 0;
+    
+    for (var key in data) {
+        if (i != 0) {
+            data_string += '&';
+        } 
+        
+        data_string += encodeURIComponent(key)+'='+encodeURIComponent(data[key]);
+        
+        i++;
+    }
+    
+    if (method == 'GET') {
+        url += '?'+data_string;
+        data_string = null;
+    }
+    
+    var object = false;
+    if (window.XMLHttpRequest) {object = new XMLHttpRequest();}
+    else if (window.ActiveXObject) {
+        try {
+            object = new ActiveXObject("Msxml2.XMLHTTP");
+        } 
+        catch (error) {
+            object = new ActiveXObject("Microsoft.XMLHTTP");
+        }
+    }
+    if (object){
+        object.open(method, url, true);
+        if (method == 'POST') {
+            object.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        }
+        object.onreadystatechange = function() {
+            if(object.readyState==4 && object.status==200){
+                
+                if (target) {
+                    new Couchover.Element(target).setHTML(object.responseText);
+                } else {
+                    var source = JSON.parse(object.responseText);
+                    if (source) {
+                        for (var key in source) {
+                            new Couchover.Element(key).setHTML(source[key]);
+                        }
+                    }
+                }
+                
+            }
+        }
+        object.send(data_string);
+    } 
+    
 }
 
 $ = Couchover;
