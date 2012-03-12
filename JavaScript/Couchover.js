@@ -208,8 +208,13 @@ Couchover.Body.prototype.showDialog = function (title, text, width) {
  *  @param string type  submit || ok
  *  @param string text
  *  @param function function_on_control Function on control when you click
+ *  @param string place Place of control
  */
-Couchover.Control = function (type, text, function_on_control) {
+Couchover.Control = function (type, text, function_on_control, place) {
+    
+        // Default place is in Dialog
+    place = place ? place : '#couchover-body-dialog-controls';
+    
     this.control = document.createElement('input');
     
     var support_type = new Array('submit','ok');
@@ -230,8 +235,14 @@ Couchover.Control = function (type, text, function_on_control) {
         this.control.className = 'couchover-control-ok';
     }
     
-    var controls = new Couchover.Element('#couchover-body-dialog-controls').getElement();
-    controls.appendChild(this.control);
+    var controls = new Couchover.Element(place).getElement();
+    
+    if (controls) {
+        controls.appendChild(this.control);
+        return true;
+    } 
+    
+    return false;
 }
 
 $ = Couchover;
