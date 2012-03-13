@@ -262,16 +262,16 @@ Couchover.AJAX = function (settings) {
     var data_string = '';
     var i = 0;
     
+        // Set data from object to string (key=value&key2=value2)
     for (var key in data) {
         if (i != 0) {
             data_string += '&';
         } 
-        
         data_string += encodeURIComponent(key)+'='+encodeURIComponent(data[key]);
-        
         i++;
     }
     
+        // Add data to the URL if method is GET
     if (method == 'GET') {
         url += '?'+data_string;
         data_string = null;
@@ -295,8 +295,10 @@ Couchover.AJAX = function (settings) {
         object.onreadystatechange = function() {
             if(object.readyState==4 && object.status==200){
                 
-                if (target) {
+                if (typeof target == 'string') {
                     new Couchover.Element(target).setHTML(object.responseText);
+                } else if (typeof target == 'function') {
+                    target(object.responseText);
                 } else {
                     var source = JSON.parse(object.responseText);
                     if (source) {
