@@ -81,6 +81,28 @@ final class Template
  
     // }}}
 
+    // {{{ getBlock
+ 
+    /**
+     * Get template block
+     * 
+     * @param string $name Block name
+     */
+    public function getBlock ($name) {
+        $url = dirname($this->view_url).'/block/'.$name.'.php';
+         
+        foreach ($this->vars as $name=>$value) {
+                // Escape chars: & < > " '
+            $$name = $this->escape($value);
+        }
+        
+        if (file_exists($url)) {
+            include_once ($url);
+        }
+    }
+ 
+    // }}}
+
     // {{{ render
  
     /**
