@@ -24,11 +24,25 @@ final class Application extends Object
     private $parameters = Array();
 
     /**
+     * Application URL
+     *
+     * @var string
+     */
+    private $application_url = '';
+
+    /**
      * Default language
      *
      * @var string
      */
     private $language_default = '';
+    
+    /**
+     * Database settings
+     *
+     * @var array
+     */
+    private $db_settings = '';
  
     // }}}
 
@@ -43,7 +57,9 @@ final class Application extends Object
         if (is_array($config)) {
             Debugger::configuration($config['debugger']);
             
+            $this->application_url = $config['application-url'];
             $this->language_default = $config['language-default'];
+            $this->db_settings = $config['db'];
         }
     } 
  
@@ -83,10 +99,10 @@ final class Application extends Object
         $language = $this->parameters['language']?:$this->language_default;
         
             // Set controller, model, view and language URL
-        $controller_url = __DIR__ . '/../Application/Controllers/' . $controller_name . 'Controller.class.php';
-        $model_url = __DIR__ . '/../Application/Models/' . $controller_name . 'Model.class.php';
-        $view_url = __DIR__ . '/../Application/Views/' . $controller_name . 'View.php';
-        $language_url = __DIR__ . '/../Languages/' . $language . '.php';
+        $controller_url = $this->application_url . '/Controllers/' . $controller_name . 'Controller.class.php';
+        $model_url = $this->application_url . '/Models/' . $controller_name . 'Model.class.php';
+        $view_url = $this->application_url . '/Views/' . $controller_name . 'View.php';
+        $language_url = $this->application_url . '/../Languages/' . $language . '.php';
         
             // Set classes and method name
         $controller_class = '\\' . $controller_name . 'Controller';
@@ -114,6 +130,7 @@ final class Application extends Object
             // Load apllication
         $controller = new $controller_class;
         $controller->model = new $model_class;
+        $controller->model->db = new DB($this->db_settings['type'],$this->db_settings['server'],$this->db_settings['username'],$this->db_settings['password'],$this->db_settings['database']);
         $controller->parameters = $this->parameters;
         $controller->template = new Template($view_url);
         $controller->lang = $lang;
