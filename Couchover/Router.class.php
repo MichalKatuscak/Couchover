@@ -107,12 +107,11 @@ final class Router
     // {{{ createLink
  
     /**
-     * Parse URL to parameters
+     * Parameters to URL
      * 
-     * @param string $url
-     * @param string $rule
+     * @param array $parameters URL parameters
      * 
-     * @return array $parameters
+     * @return string $url
      */
     public function createLink ($parameters) {  
             $url = './';
