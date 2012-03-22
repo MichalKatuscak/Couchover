@@ -43,6 +43,13 @@ final class Application extends Object
      * @var array
      */
     private $db_settings = '';
+    
+    /**
+     * Router
+     *
+     * @var object
+     */
+    private $router;
  
     // }}}
 
@@ -75,6 +82,7 @@ final class Application extends Object
     public function route ($router) {
         Debugger::test('isArray', $router->parameters, 'Application->route(): Parameters from router are in array');
         $this->parameters = $router->parameters;
+        $this->router = $router;
     } 
  
     // }}}
@@ -133,7 +141,11 @@ final class Application extends Object
         $controller->model->db = new DB($this->db_settings['type'],$this->db_settings['server'],$this->db_settings['username'],$this->db_settings['password'],$this->db_settings['database']);
         $controller->parameters = $this->parameters;
         $controller->template = new Template($view_url);
+        $controller->template->router = $this->router;
         $controller->lang = $lang;
+        
+            // Run construct
+        if (method_exists($controller_class, 'construct')) $controller->construct();
         
             // Run application
         $controller->$action_method();

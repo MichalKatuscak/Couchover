@@ -22,6 +22,20 @@ final class Router
      * @var array
      */
     public $parameters = Array();
+
+    /**
+     * Route rule
+     *
+     * @var string
+     */
+    private $rule = '';
+
+    /**
+     * Default route
+     *
+     * @var string
+     */
+    private $default = '';
  
     // }}}
     
@@ -31,6 +45,9 @@ final class Router
      * Create route
      */
     public function __construct ($rule, $default) {
+        $this->rule = $rule;
+        $this->default = $default;
+        
             // Is it relative URL route?
         if (array($rule[0],$rule[1],$default[0],$default[1]) == array('/','/','/','/')) {
                 // Transform "//relative_url" -> "relative_url"
@@ -83,6 +100,46 @@ final class Router
             $parameters['others'] = array_values(array_filter($parameter_values, 'strlen'));
             
             return $parameters;
+    }
+ 
+    // }}}
+    
+    // {{{ createLink
+ 
+    /**
+     * Parse URL to parameters
+     * 
+     * @param string $url
+     * @param string $rule
+     * 
+     * @return array $parameters
+     */
+    public function createLink ($parameters) {  
+            $url = './';
+            $parameter_names = explode('/', $this->rule);
+            $parameter_values = $parameters;
+            $parameter_value_default = explode('/', $this->default);
+            foreach ($parameter_names as $key=>$name) {
+                $full_name = str_replace(':','',$name);
+                if ($name != '' && $name[0] == ':' && (isset($parameter_values[$full_name]) || isset($parameter_value_default[$key]))) {
+                    $url .= (isset($parameter_values[$full_name]) && $parameter_values[$full_name] != '')?$parameter_values[$full_name]:$parameter_value_default[$key];
+                    $url .= '/';
+                } 
+            }
+            
+            if (isset($parameters['others'])) {
+                if (is_array($parameters['others'])) {
+                    foreach ($parameters['others'] as $other) {
+                        $url .= $other;
+                        $url .= '/';
+                    }
+                } else {
+                    $url .= $parameters['others'];
+                    $url .= '/';
+                }
+            }
+            
+            return $url;
     }
  
     // }}}

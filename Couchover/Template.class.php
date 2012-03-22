@@ -30,6 +30,13 @@ final class Template
      */
     public $vars = Array();
  
+    /**
+     * Router
+     *
+     * @var object 
+     */
+    public $router;
+ 
     // }}}
 
     // {{{ __contruct
@@ -41,6 +48,27 @@ final class Template
      */
     public function __construct ($view_url) {
         $this->view_url = $view_url;
+    }
+ 
+    // }}}
+
+    // {{{ createLink
+ 
+    /**
+     * Create link
+     *
+     * @param string $url
+     */
+    public function createLink ($parameters) {
+        if (!is_array($parameters)) {
+            $args = func_get_args();
+            $parameters = Array();
+            if (isset($args[0])) $parameters['controller'] = $args[0];
+            if (isset($args[1])) $parameters['action'] = $args[1];
+            if (isset($args[2])) $parameters['others'] = $args[2];
+        }
+        $url = $this->router->createLink($parameters);
+        return $url;
     }
  
     // }}}
@@ -90,7 +118,7 @@ final class Template
      */
     public function getBlock ($name) {
         $url = dirname($this->view_url).'/block/'.$name.'.php';
-         
+        
         foreach ($this->vars as $name=>$value) {
                 // Escape chars: & < > " '
             $$name = $this->escape($value);
