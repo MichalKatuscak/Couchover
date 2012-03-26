@@ -58,7 +58,7 @@ final class DB
             if ($this->connection->connect_errno) {
                 Debugger::error('Failed to connect to MySQLi: (' . $this->connection->connect_errno . ') ' . $this->connection->connect_error, E_USER_ERROR);
             }
-            $this->connection->query('SET CHARACTER SET utf8');
+            $this->connection->query('SET NAMES utf8;');
         }
     } 
     
@@ -202,7 +202,9 @@ final class DB
      */
     public function limit ($limit, $offset = 0) {
         $this->query .= ' LIMIT ' . (int) $limit;
-        $this->query .= ' OFFSET ' . (int) $offset;
+        if ($offset != 0) {
+            $this->query .= ' OFFSET ' . (int) $offset;
+        }
         return $this->query($this->query);
     } 
     
@@ -213,43 +215,20 @@ final class DB
     /**
      * Start UPDATE query
      *
-     * @param string $table TAble
+     * @param string $table Table
+     * @param array $data Data to UPDATE
      * @return object This                          
      */
-    public function update ($table) {
-        $this->query = 'UPDATE ' . $table;
+    public function update ($table, $data) {
+        $this->query = 'UPDATE ' . addslashes($table) . ' SET ';
+        $i = 0;
+        foreach ($data as $key=>$value) {
+            if ($i == 1) $this->query .= ',';
+            $this->query .= $key . ' = \'' . addslashes($value) . '\'';
+            $i = 1;
+        }  
         return $this;
-    } 
-    
-    // }}}
-
-    // {{{ set()
- 
-    /**
-     * Add SET to Query
-     *
-     * @param mixed
-     * @return object This                          
-     */
-    public function set () {
-        $this->query .= ' SET ';    
-        $args = func_get_args();
-        
-        if (isset($args[1])) {
-            $template = $args[0];
-            unset($args[0]);
-            $i = 0;
-            foreach ($args as $key=>$value) {
-                if (is_string($value)) {
-                    $args[$key] = '\'' . addslashes($value) . '\'';
-                }
-            }
-            $this->query .= vsprintf($template, $args);
-        } elseif (isset($args[0])) {
-            $this->query .= $args[0];
-        }
-        return $this;
-    } 
+    }
     
     // }}}
 
@@ -265,19 +244,17 @@ final class DB
     public function insert ($table, $data) {
         $this->query = 'INSERT INTO ' . addslashes($table) . ' (';
         $i = 0;
+        $values = '';
         foreach ($data as $key=>$value) {
-            if ($i == 1) $this->query .= ',';
+            if ($i == 1) {
+                $this->query .= ',';
+                $values .= ',';
+            }
             $this->query .= addslashes($key);
+            $values .= '\'' . addslashes($value) . '\'';
             $i = 1;
         }
-        $this->query .= ') VALUES (';
-        $i = 0;
-        foreach ($data as $key=>$value) {
-            if ($i == 1) $this->query .= ',';
-            $this->query .= '\'' . addslashes($value) . '\'';
-            $i = 1;
-        }  
-        $this->query .= ')';
+        $this->query .= ') VALUES (' . $values . ')';
         return $this->query($this->query);
     }
     
