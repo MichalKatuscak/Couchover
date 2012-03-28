@@ -162,6 +162,7 @@ final class Debugger
         switch ($level) {
             case 1:     // Log errors
                 ini_set('display_errors','Off');
+                ini_set('log_errors', 'On');
                 ini_set('error_log', $file_log);
                 break;
             case 2:     // Show errors
