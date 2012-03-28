@@ -45,6 +45,7 @@ final class Template
      * Set URL of template
      *
      * @param string $view HTML
+     * @param array $parameters URL parameters
      */
     public function __construct ($view_url) {
         $this->view_url = $view_url;
@@ -137,7 +138,7 @@ final class Template
      * Render template
      */
     public function render () {
-        Debugger::test('isArray', $this->vars, 'Template->render(): Template vars is Array?');
+        $this->vars['parameters'] = $this->router->parameters;
         
         foreach ($this->vars as $name=>$value) {
                 // Escape chars: & < > " '

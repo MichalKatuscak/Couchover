@@ -66,6 +66,7 @@ final class Router
             
                 // Set parameters for Application
             $this->parameters = $parameters;
+            $this->parameters['baseUrl'] = 'http://' . $_SERVER['SERVER_NAME'] . dirname($_SERVER['PHP_SELF']) . '/';
             
         } else {
             Debugger::error('Error in the routing rule. It does not support absolute route.', E_USER_ERROR);
@@ -121,7 +122,7 @@ final class Router
             foreach ($parameter_names as $key=>$name) {
                 $full_name = str_replace(':','',$name);
                 if ($name != '' && $name[0] == ':' && (isset($parameter_values[$full_name]) || isset($parameter_value_default[$key]))) {
-                    $url .= (isset($parameter_values[$full_name]) && $parameter_values[$full_name] != '')?$parameter_values[$full_name]:$parameter_value_default[$key];
+                    $url .= (isset($parameter_values[$full_name]) && $parameter_values[$full_name] != '')?$parameter_values[$full_name]:((isset($this->parameters[$full_name]) && $this->parameters[$full_name] != '')?$this->parameters[$full_name]:$parameter_value_default[$key]);
                     $url .= '/';
                 } 
             }
