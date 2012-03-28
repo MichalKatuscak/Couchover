@@ -50,6 +50,13 @@ final class Application extends Object
      * @var object
      */
     private $router;
+    
+    /**
+     * Login
+     *
+     * @var bool
+     */
+    private $login = false;
  
     // }}}
 
@@ -64,9 +71,10 @@ final class Application extends Object
         if (is_array($config)) {
             Debugger::configuration($config['debugger']);
             
-            $this->application_url = $config['application-url'];
             $this->language_default = $config['language-default'];
             $this->db_settings = $config['db'];
+            $this->application_url = $config['application-url'];
+            $this->login = $config['application']['login'];
         }
     } 
  
@@ -105,6 +113,12 @@ final class Application extends Object
         $controller_name = $this->parameters['controller'];
         $action_name = $this->parameters['action'];
         $language = $this->parameters['language']?:$this->language_default;
+        
+            // Login to application
+        if ($this->login && !Login::isLogged('application')) {
+            $controller_name = 'Login';
+            $action_name = 'default';
+        }
         
             // Set controller, model, view and language URL
         $controller_url = $this->application_url . '/Controllers/' . $controller_name . 'Controller.class.php';
