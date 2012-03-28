@@ -5,6 +5,8 @@ $config = Array();
 $config['language-default'] = 'cs';
 
 $config['application-url'] = __DIR__ . '/Application';
+$config['application'] = Array();
+$config['application']['login'] = true;
 
 $config['db'] = Array();
 $config['db']['type'] = 'MySQLi';
