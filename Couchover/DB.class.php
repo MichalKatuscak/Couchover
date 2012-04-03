@@ -322,8 +322,8 @@ final class DB
     /**
      * Escape SQL
      *
-     * @param string $string    
-     * @return string Escaped string                        
+     * @param array $args Arguments to stringify 
+     * @return string Stringifed                   
      */
     public function stringify ($args) {
         if (isset($args[1])) {
