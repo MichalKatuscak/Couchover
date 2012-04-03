@@ -24,6 +24,13 @@ final class DB
     private $connection;  
 
     /**
+     * Test Query
+     *
+     * @var bool
+     */
+    public $test = false; 
+
+    /**
      * Type of database
      *
      * @var string
@@ -72,9 +79,21 @@ final class DB
      * @param string $query SQL query
      * @return object Result of query                            
      */
-    public function query ($query) {
-        if ($result = $this->connection->query($query)) {
-            return $result;
+    public function query () {
+        $args = func_get_args();
+        $query = $this->stringify($args);
+        
+        if ($this->test) {
+            echo $query;
+            return 1;
+        }
+        
+        switch ($this->type) {
+            case 'MySQLi':
+                if ($result = $this->connection->query($query)) {
+                    return $result;
+                }
+                break;
         }
         Debugger::error('<span title="' . $query . '">Query failed</span>: (' . $this->connection->errno . ') ' . $this->connection->error, E_USER_ERROR);
         return 0;
@@ -109,8 +128,24 @@ final class DB
      * @param int $type Type of result array (number, assoc)     
      * @return array Result of query                            
      */
-    public function fetchArray ($result, $type = MYSQLI_ASSOC) {
-        for ($res = array(); $tmp = $result->fetch_array($type);) $res[] = $tmp;
+    public function fetchArray ($result, $type = 'ASSOC') {
+        switch ($this->type) {
+            case 'MySQLi':
+                switch ($type) {
+                    case 'NUM':
+                        $type = MYSQLI_NUM;
+                        break;
+                    case 'BOTH':
+                        $type = MYSQLI_BOTH;
+                        break;
+                    default:
+                        $type = MYSQLI_ASSOC;
+                }
+                for ($res = array(); $tmp = $result->fetch_array($type);) {
+                    $res[] = $tmp;
+                }
+                break;
+        }
         return $res;
     }
     
@@ -125,7 +160,7 @@ final class DB
      * @return object This                            
      */
     public function select ($what) {
-        $this->query = 'SELECT ' . addslashes($what);
+        $this->query = 'SELECT ' . $this->escape($what);
         return $this;
     }
     
@@ -140,7 +175,7 @@ final class DB
      * @return object This                          
      */
     public function from ($table) {
-        $this->query .= ' FROM ' . addslashes($table);
+        $this->query .= ' FROM ' . $this->escape($table);
         return $this;
     }
     
@@ -157,19 +192,7 @@ final class DB
     public function where () {
         $this->query .= ' WHERE ';    
         $args = func_get_args();
-        
-        if (isset($args[1])) {
-            $template = $args[0];
-            unset($args[0]);
-            foreach ($args as $key=>$value) {
-                if (is_string($value)) {
-                    $args[$key] = '\'' . addslashes($value) . '\'';
-                }
-            }
-            $this->query .= vsprintf($template, $args);
-        } elseif (isset($args[0])) {
-            $this->query .= $args[0];
-        }
+        $this->query .= $this->stringify($args);
         return $this;
     }
     
@@ -185,7 +208,7 @@ final class DB
      * @return object This                          
      */
     public function order ($by, $desc = '') {
-        $this->query .= ' ORDER BY ' . addslashes($by) . ' ' . $desc;
+        $this->query .= ' ORDER BY ' . $this->escape($by) . ' ' . $desc;
         return $this;
     } 
     
@@ -220,11 +243,11 @@ final class DB
      * @return object This                          
      */
     public function update ($table, $data) {
-        $this->query = 'UPDATE ' . addslashes($table) . ' SET ';
+        $this->query = 'UPDATE ' . $this->escape($table) . ' SET ';
         $i = 0;
         foreach ($data as $key=>$value) {
             if ($i == 1) $this->query .= ',';
-            $this->query .= $key . ' = \'' . addslashes($value) . '\'';
+            $this->query .= $key . ' = \'' . $this->escape($value) . '\'';
             $i = 1;
         }  
         return $this;
@@ -242,7 +265,7 @@ final class DB
      * @return object Result of query                          
      */
     public function insert ($table, $data) {
-        $this->query = 'INSERT INTO ' . addslashes($table) . ' (';
+        $this->query = 'INSERT INTO ' . $this->escape($table) . ' (';
         $i = 0;
         $values = '';
         foreach ($data as $key=>$value) {
@@ -250,8 +273,8 @@ final class DB
                 $this->query .= ',';
                 $values .= ',';
             }
-            $this->query .= addslashes($key);
-            $values .= '\'' . addslashes($value) . '\'';
+            $this->query .= $this->escape($key);
+            $values .= '\'' . $this->escape($value) . '\'';
             $i = 1;
         }
         $this->query .= ') VALUES (' . $values . ')';
@@ -269,8 +292,54 @@ final class DB
      * @return object This                         
      */
     public function delete ($table) {
-        $this->query = 'DELETE FROM ' . addslashes($table);
+        $this->query = 'DELETE FROM ' . $this->escape($table);
         return $this;
+    }
+    
+    // }}}
+
+    // {{{ escape()
+ 
+    /**
+     * Escape SQL
+     *
+     * @param string $string    
+     * @return string Escaped string                        
+     */
+    public function escape ($string) {
+        switch ($this->type) {
+            case 'MySQLi':
+                return $this->connection->real_escape_string($string);
+            default:
+                return addslashes($string);
+        }
+    }
+    
+    // }}}
+
+    // {{{ stringify()
+ 
+    /**
+     * Escape SQL
+     *
+     * @param string $string    
+     * @return string Escaped string                        
+     */
+    public function stringify ($args) {
+        if (isset($args[1])) {
+            $template = $args[0];
+            unset($args[0]);
+            foreach ($args as $key=>$value) {
+                if (is_string($value)) {
+                    $args[$key] = '\'' . $this->escape($value) . '\'';
+                }
+            }
+            return vsprintf($template, $args);
+        } elseif (isset($args[0])) {
+            return $args[0];
+        } else {
+            return 0;
+        }
     }
     
     // }}}
