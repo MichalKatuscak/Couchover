@@ -320,9 +320,9 @@ final class DB
     // {{{ stringify()
  
     /**
-     * Escape SQL
+     * Arguments to stringify 
      *
-     * @param array $args Arguments to stringify 
+     * @param array $args Arguments
      * @return string Stringifed                   
      */
     public function stringify ($args) {
