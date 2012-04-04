@@ -76,6 +76,8 @@ final class Application extends Object
             $this->application_url = $config['application-url'];
             $this->login = $config['application']['login'];
         }
+        
+        Session::$UID = md5($_SERVER['HTTP_USER_AGENT'] . $_SERVER['REMOTE_ADDR']);
     } 
  
     // }}}

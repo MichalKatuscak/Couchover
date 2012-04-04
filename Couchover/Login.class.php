@@ -23,7 +23,7 @@ final class Login
      * @return bool
      */
     public static function isLogged ($name = 'Default') {
-        if (isset($_SESSION['couchover-' . $name . '-login']) && is_array($_SESSION['couchover-' . $name . '-login'])) {
+        if (is_array(Session::get($name . '-login'))) {
             return true;
         }
         return false;
@@ -41,7 +41,7 @@ final class Login
      */
     public static function set ($name = 'Default', $data) {
         if (is_array($data)) {
-            $_SESSION['couchover-' . $name . '-login'] = $data;
+            Session::set($name . '-login', $data);
             return true;
         }
         return false;
@@ -57,7 +57,7 @@ final class Login
      * @return bool
      */
     public static function logout ($name = 'Default') {
-         unset($_SESSION['couchover-' . $name . '-login']);
+         Session::delete($name . '-login');
     }
     
     // }}}
