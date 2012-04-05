@@ -9,7 +9,7 @@ session_start();
 /**
  * Session.class.php
  *
- * Class to login
+ * Working with session variables
  *
  * @author     Michal Katuščák <michal@katuscak.cz>
  * @license    Creative Commons 3.0 http://creativecommons.org/licenses/by/3.0/
