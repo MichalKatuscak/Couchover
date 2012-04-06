@@ -28,7 +28,7 @@ final class DB
      *
      * @var bool
      */
-    public $test = false; 
+    private $test = FALSE; 
 
     /**
      * Type of database
@@ -313,6 +313,28 @@ final class DB
             default:
                 return addslashes($string);
         }
+    }
+    
+    // }}}
+
+    // {{{ testStart()
+ 
+    /**
+     * Start testing SQL queries                   
+     */
+    public function testStart () {
+        $this->test = TRUE;
+    }
+    
+    // }}}
+
+    // {{{ testEnd()
+ 
+    /**
+     * End testing SQL queries                   
+     */
+    public function testEnd () {
+        $this->test = FALSE;
     }
     
     // }}}
