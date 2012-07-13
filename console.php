@@ -129,18 +129,22 @@ namespace Console {
 
 namespace Console\Functions {
     
-    final class Install implements \Console\Interfaces\iFunction {
+    final class Gem implements \Console\Interfaces\iFunction {
 
-        private $message = '';
+        private $main_option = 'install';
+        
+        private $options = Array();
         
         /**
-         * Set message
+         * Set main option
          * 
          * @param array $parameters
          */
         public function __construct($parameters){
             
-            $this->message = $parameters[0];
+            $this->main_option = $parameters[0];
+            unset($parameters[0]);
+            $this->options = array_values($parameters);
             
         }
         
@@ -149,9 +153,18 @@ namespace Console\Functions {
          * 
          * @return string
          */
-        public function run(){
+        public function run() {
             
-            return 'Instalace '.$this->message.' proběhla v pořádku {warning}';
+            switch ($this->main_option) {
+                case 'install':
+                    return 'Instalace modulů <b>' . implode(' ', $this->options) . '</b> proběhla úspěšně. {success}';
+                    break;
+                case 'update':
+                    return 'Nové verze modulů <b>' . implode(' ', $this->options) . '</b> byly nainstalovány. {success}';
+                    break;
+                default:
+                    return 'Volba <b>' . $this->main_option . '</b> nebyla nalezena. {warning}';
+            }
             
         }
         
