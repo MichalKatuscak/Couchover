@@ -156,19 +156,120 @@ namespace Console\Functions {
         public function run() {
             
             switch ($this->main_option) {
+                
                 case 'install':
-                    return 'Instalace modulů <b>' . implode(' ', $this->options) . '</b> proběhla úspěšně. {success}';
+                    
+                    $files = $this->getZipFiles($this->options);
+                    
+                    if ($this->unZipFiles($files)) {
+                        return 'Instalace modulů <b>' . implode(' ', $this->options) . '</b> proběhla úspěšně. {success}';
+                    } else {
+                        return 'Nastala chyba.';
+                    }
+                    
                     break;
+                    
                 case 'update':
-                    return 'Nové verze modulů <b>' . implode(' ', $this->options) . '</b> byly nainstalovány. {success}';
+                    
+                    $files = $this->getZipFiles($this->options);
+                    if ($this->unZipFiles($files)) {
+                        return 'Nové verze modulů <b>' . implode(' ', $this->options) . '</b> byly nainstalovány. {success}';
+                    } else {
+                        return 'Nastala chyba.';
+                    }
+                    
                     break;
+                
                 default:
+                    
                     return 'Volba <b>' . $this->main_option . '</b> nebyla nalezena. {warning}';
+                    
             }
             
         }
         
+        /**
+         * Get ZIP files from http://files.couchover.com
+         * 
+         * @param array $file_names
+         * @return array
+         */
+        private function getZipFiles($file_names) {
+            
+            $files = Array();
+            
+            foreach ($file_names as $file_name) {
+                
+                $file_name = str_replace('/', '', $file_name);
+                $file = @file_get_contents('http://files.couchover.com/'.$file_name.'.zip');
+                
+                if ($file) {
+                    
+                    file_put_contents('./temp/'.$file_name.'.zip', $file);
+                    $files[] = $file_name;
+                    
+                }
+                
+            }
+            
+            return $files;
+                
+        }
+        
+        /**
+         * UnZIP files from archive 
+         * 
+         * @param array $files
+         * @return bool
+         */
+        private function unZipFiles($files) {
+            
+            $return = true;
+            
+            foreach ($files as $file_name) {
+                
+                $zip = zip_open('./temp/'.$file_name.'.zip');
+                
+                while ($entry = zip_read($zip)) {
+                    
+                    $entry_name = zip_entry_name($entry);
+                    
+                    if (!file_exists($entry_name) && substr($entry_name,0,-1).'/' == $entry_name) {
+                        
+                        $dir = '';
+                        foreach (explode('/',$entry_name) as $name) {
+                            
+                            $dir .= $name.'/';
+                            if (!file_exists($dir)) {
+                                
+                                mkdir($dir, 0777);
+                            
+                            }
+                            
+                        }
+                        
+                    } elseif (substr($entry_name,0,-1).'/' != $entry_name) {
+                        
+                        $file = zip_entry_read($entry, zip_entry_filesize($entry));
+                        
+                        if (!file_put_contents($entry_name, $file)) {
+                            
+                           $return false;
+                           
+                        }
+                        
+                    }
+                    
+                }
+                
+            }
+            
+            return $return;
+            
+        }
+        
     }
+    
 }
 
 namespace Page {
