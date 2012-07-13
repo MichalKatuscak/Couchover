@@ -254,7 +254,7 @@ namespace Console\Functions {
                         
                         if (!file_put_contents($entry_name, $file)) {
                             
-                           $return false;
+                           $return = false;
                            
                         }
                         
