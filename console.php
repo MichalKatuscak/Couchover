@@ -305,9 +305,11 @@ namespace Console\Functions {
     
     final class Source extends Extension implements \Console\Interfaces\iFunction {
 
+        /** @var string */
         private $main_option = 'install';
         
-        private $options = Array();
+        /** @var array */
+        private $options;
         
         /**
          * Set main option
