@@ -144,7 +144,7 @@ namespace Console\Functions {
             curl_setopt($ch,CURLOPT_CONNECTTIMEOUT,5);
             $data = curl_exec($ch);
             curl_close($ch);
-            
+
             return $data; 
             
         }
@@ -155,8 +155,8 @@ namespace Console\Functions {
          * @param string $uri
          */
         private function fgc($uri){
-            
-           return file_get_contents($uri); 
+
+            return file_get_contents($uri); 
            
         }
         
@@ -167,15 +167,15 @@ namespace Console\Functions {
          */
         private function getContentUrl($uri){
             
-           if(extension_loaded("curl")){
-               
-              return $this->curl($uri);
-              
-           } else {
-               
-              return $this->fgc($uri);
-              
-           } 
+            if(extension_loaded("curl")){
+
+                return $this->curl($uri);
+
+            } else {
+
+                return $this->fgc($uri);
+
+            } 
            
         }
         
@@ -187,22 +187,22 @@ namespace Console\Functions {
          */
         private function existPackpage($name){
             
-           $pack = $this->getContentUrl('http://source.couchover.com/source/');
-           $pack = explode("\n", $pack);
-           
-           foreach($pack as $p){
-               
+            $pack = $this->getContentUrl('http://source.couchover.com/source/');
+            $pack = explode("\n", $pack);
+
+            foreach($pack as $p){
+
                 $to = explode(' - ', $p);
-                
+
                 if($to[0] == $name){
-                    
+
                     return $to;
-                    
+
                 }
-                
-           } 
-           
-           return false;
+
+            } 
+
+            return false;
         }
         
         /**
