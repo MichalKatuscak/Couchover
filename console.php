@@ -3,7 +3,7 @@
 /**
  * Console for Couchover Framework
  * 
- * @author      Richard Hutta & Michal Katuščák
+ * @author      Richard Hutta & Michal KatuĹˇÄŤĂˇk
  * @copyright   2012
  * @package     Couchover
  */
@@ -60,7 +60,7 @@ namespace Console {
                 
             } else {
                 
-                $this->setStatus('Příkaz nenalezen', 'error');
+                $this->setStatus('PĹ™Ă­kaz nenalezen', 'error');
                 return false;
                 
             }
@@ -129,8 +129,97 @@ namespace Console {
 
 namespace Console\Functions {
     
-    abstract class BaseFunction {
+    abstract class Extension {
+        
+        /**
+         * Get data with CURL
+         * 
+         * @param string $uri
+         */
+        private function curl($uri){
+            
+            $ch = curl_init();
+            curl_setopt($ch,CURLOPT_URL,$uri);
+            curl_setopt($ch,CURLOPT_RETURNTRANSFER,1);
+            curl_setopt($ch,CURLOPT_CONNECTTIMEOUT,5);
+            $data = curl_exec($ch);
+            curl_close($ch);
+            
+            return $data; 
+            
+        }
+        
+        /**
+         * Get data with file_get_contents
+         * 
+         * @param string $uri
+         */
+        private function fgc($uri){
+            
+           return file_get_contents($uri); 
+           
+        }
+        
+        /**
+         * Get data
+         * 
+         * @param string $uri
+         */
+        private function getContentUrl($uri){
+            
+           if(extension_loaded("curl")){
+               
+              return $this->curl($uri);
+              
+           } else {
+               
+              return $this->fgc($uri);
+              
+           } 
+           
+        }
+        
+        /**
+         * Exists package
+         * 
+         * @param string $name
+         * @return boolean 
+         */
+        private function existPackpage($name){
+            
+           $pack = $this->getContentUrl('http://source.couchover.com/source/');
+           $pack = explode("\n", $pack);
+           
+           foreach($pack as $p){
+               
+                $to = explode(' - ', $p);
                 
+                if($to[0] == $name){
+                    
+                    return $to;
+                    
+                }
+                
+           } 
+           
+           return false;
+        }
+        
+        /**
+         * Get packege from source.couchover.com
+         * 
+         * @param string $name 
+         */
+        protected function getPackpage($name){
+            
+            if($this->existPackpage($name)){
+                
+                $pack = $this->getContentUrl('http://source.couchover.com/'.$name.'.zip');
+                
+            } 
+            
+        }
+        
         /**
          * Get ZIP files from http://files.couchover.com
          * 
@@ -211,10 +300,10 @@ namespace Console\Functions {
             
         }
         
+        
     }
-
-
-    final class Source extends BaseFunction implements \Console\Interfaces\iFunction {
+    
+    final class Source extends Extension implements \Console\Interfaces\iFunction {
 
         private $main_option = 'install';
         
@@ -247,7 +336,7 @@ namespace Console\Functions {
                     $files = $this->getZipFiles($this->options);
                     
                     if ($this->unZipFiles($files)) {
-                        return 'Instalace modulů <b>' . implode(' ', $this->options) . '</b> proběhla úspěšně. {success}';
+                        return 'Instalace modulĹŻ <b>' . implode(' ', $this->options) . '</b> probÄ›hla ĂşspÄ›ĹˇnÄ›. {success}';
                     } else {
                         return 'Nastala chyba.';
                     }
@@ -258,7 +347,7 @@ namespace Console\Functions {
                     
                     $files = $this->getZipFiles($this->options);
                     if ($this->unZipFiles($files)) {
-                        return 'Nové verze modulů <b>' . implode(' ', $this->options) . '</b> byly nainstalovány. {success}';
+                        return 'NovĂ© verze modulĹŻ <b>' . implode(' ', $this->options) . '</b> byly nainstalovĂˇny. {success}';
                     } else {
                         return 'Nastala chyba.';
                     }
